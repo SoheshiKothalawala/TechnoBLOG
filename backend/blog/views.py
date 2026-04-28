@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Post, Comment
 
-# 🔐 LOGIN (NO AUTH REQUIRED)
+# LOGIN (NO AUTH REQUIRED)
 @api_view(['POST'])
 def login(request):
     user = authenticate(
@@ -20,7 +20,7 @@ def login(request):
     return Response({"error": "Invalid"}, status=401)
 
 
-# 📄 GET POSTS (PUBLIC)
+# GET POSTS (PUBLIC)
 @api_view(['GET'])
 def posts(request):
     data = Post.objects.all().order_by('-id')[:3]
@@ -36,7 +36,7 @@ def posts(request):
     ])
 
 
-# ✍️ CREATE POST (PROTECTED)
+#  CREATE POST (PROTECTED)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  
 def create_post(request):
@@ -48,10 +48,10 @@ def create_post(request):
         user=request.user
     )
 
-    return Response({"msg": "created"})
+    return Response({"msg": "Created Successfully! "})
 
 
-# 💬 COMMENT (PROTECTED)
+# COMMENT (PROTECTED)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])   
 def comment(request, id):
@@ -62,4 +62,33 @@ def comment(request, id):
         text=request.data['text']
     )
 
-    return Response({"msg": "comment added"})
+    return Response({"msg": "Comment Added Successfully ! "})
+
+# UPDATE POST
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_post(request, id):
+    try:
+        post = Post.objects.get(id=id, user=request.user)  
+    except Post.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)
+
+    post.title = request.data.get("title", post.title)
+    post.content = request.data.get("content", post.content)
+    post.save()
+
+    return Response({"msg": "Updated Successfully! "})
+
+# DELETE POST
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_post(request, id):
+    try:
+        post = Post.objects.get(id=id, user=request.user)
+    except Post.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)
+
+    post.delete()
+    return Response({"msg": "deleted"})
+
+

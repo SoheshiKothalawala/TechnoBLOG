@@ -13,6 +13,8 @@ urlpatterns = [
     path('api/posts', views.posts),
     path('api/create-post', views.create_post),
     path('api/comment/<int:id>', views.comment),
+    path('api/update-post/<int:id>', views.update_post),
+    path('api/delete-post/<int:id>', views.delete_post),
     path('', home),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
